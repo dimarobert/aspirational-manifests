@@ -1,3 +1,5 @@
+using Aspirate.Processors.Transformation;
+
 namespace Aspirate.Processors;
 
 /// <summary>
@@ -60,6 +62,13 @@ public abstract class BaseResourceProcessor : IResourceProcessor
         return disableSecrets == true ? resourceWithEnv : resourceWithEnv.Where(e => !ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
+    protected Dictionary<string, string?> GetFilteredEnvironmentalVariables(KeyValuePair<string, Resource> resource, bool? disableSecrets, bool? withDashboard, AspirateState state)
+    {
+        var resourceWithEnv = resource.MapResourceToEnvVars(withDashboard);
+
+        return disableSecrets == true ? resourceWithEnv : resourceWithEnv.Where(e => !(state.SecretsMap.TryGetValue($"{resource.Value.Name}.{Literals.Env}.{e.Key}", out var isSecret) && isSecret)).ToDictionary(e => e.Key, e => e.Value);
+    }
+
     /// <summary>
     /// Filters the environmental variables of a given resource and returns a dictionary of the secret variables.
     /// </summary>
@@ -72,6 +81,13 @@ public abstract class BaseResourceProcessor : IResourceProcessor
         var resourceWithEnv = resource.MapResourceToEnvVars(withDashboard);
 
         return resourceWithEnv.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+    }
+
+    protected Dictionary<string, string?> GetSecretEnvironmentalVariables(KeyValuePair<string, Resource> resource, bool? disableSecrets, bool? withDashboard, AspirateState state)
+    {
+        var resourceWithEnv = resource.MapResourceToEnvVars(withDashboard);
+
+        return resourceWithEnv.Where(e => state.SecretsMap.TryGetValue($"{resource.Value.Name}.{Literals.Env}.{e.Key}", out var isSecret) && isSecret).ToDictionary(e => e.Key, e => e.Value);
     }
 
     /// <inheritdoc />

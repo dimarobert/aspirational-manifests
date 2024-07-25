@@ -268,6 +268,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
 
         return handler.CreateKubernetesObjects(new()
         {
+            CurrentState = state,
             Resource = resource,
             ImagePullPolicy = state.ImagePullPolicy,
             DisableSecrets = state.DisableSecrets,

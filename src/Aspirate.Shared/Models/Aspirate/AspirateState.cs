@@ -194,4 +194,7 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool? ReplaceSecrets { get; set; }
+
+    [JsonIgnore]
+    public Dictionary<string, bool>? SecretsMap { get; set; }
 }

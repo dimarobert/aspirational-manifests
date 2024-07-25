@@ -99,6 +99,10 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
+        var replMap = rootNode["$replacementMap"] ?? (rootNode["$replacementMap"] = new JsonObject());
+        var jsonValuePath = jsonValue.GetPath().TrimStart('$').TrimStart('.');
+        var valueReplList = replMap[jsonValuePath] as JsonArray ?? (replMap[jsonValuePath] = new JsonArray()) as JsonArray;
+
         var matches = PlaceholderPatternRegex().Matches(input);
         for (var i = 0; i < matches.Count; i++)
         {
@@ -134,6 +138,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             }
 
             input = input.Replace($"{{{jsonPath}}}", value.ToString(), StringComparison.OrdinalIgnoreCase);
+            valueReplList.Add(pathParts.TryParseAsJsonNode());
         }
 
         var pointer = jsonValue.GetPointerFromRoot();

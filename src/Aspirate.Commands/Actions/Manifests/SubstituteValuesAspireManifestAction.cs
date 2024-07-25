@@ -6,7 +6,7 @@ public class SubstituteValuesAspireManifestAction(IServiceProvider serviceProvid
     {
         Logger.WriteRuler("[purple]Handle Value and Parameter Substitution[/]");
 
-        transformer.ProcessEvaluations(CurrentState.LoadedAspireManifestResources);
+        CurrentState.SecretsMap = transformer.ProcessEvaluations(CurrentState.LoadedAspireManifestResources);
 
         return Task.FromResult(true);
     }
